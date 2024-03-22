@@ -23,20 +23,25 @@ const Login = () => {
         signInWithEmailAndPassword(auth, loginData.email, loginData.password)
             .then((resp) => {
                 console.log(resp);
-                console.log(auth.currentUser);
+                console.log(auth.currentUser.uid);
+                console.log(auth.currentUser.email);
                 const userRef = collection(firestore, 'users');
                 const q = query(userRef, where('uid', '==', auth.currentUser.uid));
                 getDocs(q)
                     .then((resp) => {
-                        console.log(resp);
-                        setLoggedInUser(resp.docs.map(doc => ({
+                        const userData = resp.docs.map(doc => ({
                             id: doc.id,
-                            ...doc.data()
-                        })));
+                            ...doc.data(),
+                        }));
+                        console.log(userData);
+                        setLoggedInUser(userData);
                         console.log(loggedInUser);
-                        navigate(`/home/${loggedInUser.email}`);
+                        navigate(`/home/${loggedInUser.username}`);
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching user data:', error);
                     });
-            });
+            })
     };
 
     return (
